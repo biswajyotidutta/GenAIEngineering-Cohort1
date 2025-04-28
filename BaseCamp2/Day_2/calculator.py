@@ -6,7 +6,7 @@ st.title("Calculator App")
 st.write("This app connects to a FastAPI calculator service.")
 
 # Define the API base URL
-api_url = "http://0.0.0.0:9321"
+api_url = "https://github.com/biswajyotidutta/GenAIEngineering-Cohort1.git"#"http://0.0.0.0:9321"
 
 # Initialize session state to store the calculator display and current operation
 if 'display' not in st.session_state:

@@ -216,3 +216,217 @@ ps aux | grep streamlit
 tasklist | findstr uvicorn
 tasklist | findstr streamlit
 ```
+
+## Git Commands
+
+Git is a distributed version control system for tracking changes in source code during software development.
+
+### Setting Up Git
+
+```bash
+# Configure user information
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Initialize a new Git repository
+git init
+
+# Clone an existing repository
+git clone https://github.com/username/repository.git
+
+# Clone a specific branch
+git clone -b branch-name https://github.com/username/repository.git
+```
+
+### Basic Git Workflow
+
+```bash
+# Check status of the repository
+git status
+
+# Add files to staging area
+git add filename.py          # Add a specific file
+git add .                    # Add all files in the current directory
+git add -A                   # Add all files in the repository
+
+# Commit changes
+git commit -m "Commit message"
+
+# Commit with both add and commit for tracked files
+git commit -am "Commit message"
+```
+
+### Working with Branches
+
+```bash
+# List all branches
+git branch                   # Local branches
+git branch -r                # Remote branches
+git branch -a                # All branches (local and remote)
+
+# Create a new branch
+git branch branch-name
+
+# Switch to a branch
+git checkout branch-name
+
+# Create and switch to a new branch
+git checkout -b branch-name
+
+# Rename a branch
+git branch -m old-name new-name
+
+# Delete a branch
+git branch -d branch-name    # Safe delete (prevents deletion of unmerged branches)
+git branch -D branch-name    # Force delete
+
+# Merge a branch into the current branch
+git merge branch-name
+```
+
+### Working with Remotes
+
+```bash
+# List remote repositories
+git remote -v
+
+# Add a remote repository
+git remote add origin https://github.com/username/repository.git
+
+# Change remote URL
+git remote set-url origin https://github.com/username/new-repository.git
+
+# Remove a remote
+git remote remove origin
+
+# Fetch changes from remote
+git fetch origin
+git fetch --all              # Fetch from all remotes
+
+# Pull changes (fetch + merge)
+git pull origin branch-name
+git pull                     # Pull from current branch tracking remote
+
+# Push changes to remote
+git push origin branch-name
+git push -u origin branch-name   # Push and set upstream
+git push                     # Push to current branch tracking remote
+git push --force             # Force push (use with caution)
+```
+
+### Viewing History & Changes
+
+```bash
+# View commit history
+git log
+git log --oneline            # Compact view
+git log --graph              # Show branching graph
+git log -n 5                 # Show only last 5 commits
+git log --author="username"  # Filter by author
+
+# View changes
+git diff                     # Unstaged changes
+git diff --staged            # Staged changes
+git diff branch1 branch2     # Differences between branches
+git diff commit1 commit2     # Differences between commits
+
+# Show changes in a commit
+git show commit-hash
+```
+
+### Stashing Changes
+
+```bash
+# Save changes temporarily
+git stash
+
+# Save with a message
+git stash save "Work in progress"
+
+# List stashes
+git stash list
+
+# Apply and keep the most recent stash
+git stash apply
+
+# Apply and drop the most recent stash
+git stash pop
+
+# Apply a specific stash
+git stash apply stash@{n}
+
+# Remove all stashed changes
+git stash clear
+```
+
+### Undoing Changes
+
+```bash
+# Discard changes in working directory
+git checkout -- filename
+git restore filename          # Git 2.23+
+
+# Unstage files
+git reset filename
+git restore --staged filename # Git 2.23+
+
+# Reset to a previous commit
+git reset commit-hash         # Keeps changes in working directory
+git reset --soft commit-hash  # Keeps changes staged
+git reset --hard commit-hash  # Discards all changes (use with caution)
+
+# Revert a commit (creates a new commit that undoes changes)
+git revert commit-hash
+```
+
+### Advanced Git Commands
+
+```bash
+# Interactive rebase for editing commit history
+git rebase -i HEAD~3          # Rebase last 3 commits
+
+# Cherry-pick commits from another branch
+git cherry-pick commit-hash
+
+# Create and apply patches
+git format-patch -1 commit-hash
+git apply patch-file.patch
+
+# Clean untracked files
+git clean -n                  # Dry run (show what would be removed)
+git clean -f                  # Force removal
+git clean -fd                 # Remove directories too
+
+# Blame (see who changed each line)
+git blame filename
+
+# Find which commit introduced a line/pattern
+git log -S "search pattern" filename
+git log -p -S "search pattern" # Show patches too
+
+# Create a tag
+git tag tag-name
+git tag -a tag-name -m "Tag message"  # Annotated tag
+
+# Push tags to remote
+git push origin tag-name
+git push --tags                # Push all tags
+```
+
+### Git Workflows with Remote Repositories
+
+```bash
+# Fetch and rebase (alternative to pull)
+git fetch origin
+git rebase origin/main
+
+# Force push with lease (safer than force push)
+git push --force-with-lease
+
+# Sync a fork with original repository
+git remote add upstream https://github.com/original/repository.git
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```

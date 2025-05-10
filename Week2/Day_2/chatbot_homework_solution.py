@@ -56,7 +56,7 @@ if prompt := st.chat_input("Ask something..."):
         st.error("Please enter your HuggingFace API key in the sidebar.")
     else:
         # Add user message to the chat history
-        st.session_state.messages.append({"role": "user", "content": prompt}) # this is where the solution is
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
         # Display the user message
         with st.chat_message("user"):
@@ -64,9 +64,9 @@ if prompt := st.chat_input("Ask something..."):
 
         # Display a spinner while waiting for the API response
         with st.spinner("Thinking..."):
-            # Prepare the payload with only the current query (no history)
+            # Prepare the payload from the conversation history
             payload = {
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": st.session_state.messages,
                 "max_tokens": 512,
                 "model": "mistralai/Mistral-7B-Instruct-v0.3"
             }
@@ -86,11 +86,3 @@ if prompt := st.chat_input("Ask something..."):
             else:
                 st.error("Failed to get a valid response from the API.")
 
-# Display information and instructions
-with st.expander("How to use this chatbot"):
-    st.write("""
-    1. Enter your HuggingFace API key in the sidebar.
-    2. Type your question in the input box at the bottom of the page.
-    3. View the response and continue the conversation.
-    4. Click 'New Conversation' in the sidebar to start fresh.
-    """)

@@ -72,7 +72,7 @@ def build_faiss_index():
 #     search_list = search_string.split()
 #     files = glob.glob(os.path.join('Day_1','csv_files', "*.csv"))
 #     df = pd.concat((pd.read_csv(f) for f in files), ignore_index=True)
-#     matches_df = df[df['chunk'].str.contains('|'.join(search_list), case=False, na=False)]
+#     matches_df = df[df['chunk'].str.contains('|'.join(search_list), case=False, na=False)] #key word search
 #     return matches_df.to_json()
 
 @app.post("/search_chunks")

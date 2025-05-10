@@ -20,7 +20,7 @@ Update the solution to respond with context of previous questions
 ### Food for thought
 
 1. Service that responds to queries from UI such that Streamlit does not use LLM, Streamlit only take input and requests a service
-2. Persistent conversations and retrieve as needed
+2. Persist conversations and retrieve as needed
 3. organize data and real-estate
 4. Tools as plug-ins
 

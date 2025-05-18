@@ -9,4 +9,5 @@ git_training
 **/.env
 **/*.pkl
 **/models/*
-
+**/.venv
+**/.ipynb_checkpoints

@@ -27,11 +27,9 @@ def get_current_datetime():
     return json.dumps({"current_datetime": datetime.now().isoformat()})
 
 def serialize_message(message):
-    """Properly serialize message for API calls."""
+    """Properly serialize message for API calls - THIS IS NECESSARY."""
     if hasattr(message, 'model_dump'):
-        # For Groq response objects
         msg_dict = message.model_dump(exclude_unset=True)
-        # Keep only the fields that Groq API expects
         serialized = {
             "role": msg_dict.get("role"),
             "content": msg_dict.get("content"),
@@ -40,7 +38,6 @@ def serialize_message(message):
             serialized["tool_calls"] = msg_dict["tool_calls"]
         return serialized
     else:
-        # For regular dictionary messages
         serialized = {
             "role": message.get("role"),
             "content": message.get("content"),
@@ -57,25 +54,25 @@ def serialize_message(message):
 
 def run_conversation(client, messages, model, tools=None, tool_choice="auto"):
     """Sends messages to Groq API and handles responses, including function calls."""
-    # System prompt defining the assistant's behavior
     system_prompt = {
         "role": "system",
-        "content": """You are a specialized Coding Assistant AI with access to previous conversation history.
+        "content": """You are a specialized Coding Assistant AI with access to various tools.
         Your primary function is to help users with programming and coding-related questions.
         
-        You have access to the entire conversation history and should use it to provide context-aware responses.
-        Remember all previous interactions and function calls made during this conversation.
+        When answering coding questions, provide Python code by default unless another language is specifically requested.
         
-        Strictly adhere to the following rules:
-        1. ONLY answer questions directly related to coding, programming languages, algorithms, data structures, software development tools, and concepts.
-        2. If the user asks a question NOT related to coding, politely refuse to answer.
-        3. Provide clear, concise, and accurate coding explanations or code snippets.
-        4. Use the get_current_datetime function when needed for time-sensitive coding questions.
-        5. Reference previous conversation context when answering follow-up questions.
+        You have access to these tools:
+        1. get_current_datetime: Get the current date and time
+        
+        Rules:
+        1. ONLY answer questions directly related to coding, programming, algorithms, data structures, and software development
+        2. Use tools when they can enhance your response
+        3. When tools are used, incorporate their output naturally into your response
+        4. Provide clear, concise code examples (Python by default)
+        5. Reference previous conversation context when appropriate
         """
     }
     
-    # Serialize messages for API call
     api_messages = [system_prompt]
     for msg in messages:
         serialized = serialize_message(msg)
@@ -156,24 +153,26 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
+    st.header("🛠️ Available Tools")
+    st.markdown("""
+    **get_current_datetime**
+    - Returns current date and time
+    - Useful for time-sensitive queries
+    """)
+    
+    st.markdown("---")
     st.markdown(
         """
         **ℹ️ About:**
         This AI assistant answers **only coding-related questions**.
-        
-        **✨ Features:**
-        - Complete conversation memory
-        - Function calling for real-time data
-        - Response evaluation
-        - Context-aware responses
+        Code examples are provided in Python by default.
         """
     )
-    st.caption("Built by T3 Chat")
+    st.caption("Built by Outskill")
 
 # --- Initialization ---
 groq_client = get_groq_client() if api_key_provided else None
 
-# Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -209,9 +208,6 @@ for idx, message in enumerate(st.session_state.messages):
             if "evaluation" in message:
                 with st.expander("View Evaluation"):
                     st.info(message["evaluation"])
-    elif message["role"] == "tool":
-        with st.expander(f"🛠️ Tool Response: {message.get('name', 'Unknown')}"):
-            st.code(message["content"], language="json")
 
 # --- Handle User Input ---
 if prompt := st.chat_input("Ask a coding question..."):
@@ -231,7 +227,6 @@ if prompt := st.chat_input("Ask a coding question..."):
         assistant_message_for_state = None
 
         with st.spinner("🧠 Thinking..."):
-            # Initial call to the LLM with full conversation history
             response_message = run_conversation(
                 client=groq_client,
                 messages=st.session_state.messages,
@@ -241,26 +236,27 @@ if prompt := st.chat_input("Ask a coding question..."):
             )
 
             if response_message:
-                # Handle function calls
                 if response_message.tool_calls:
-                    # Store the assistant's message with tool_calls
                     tool_calls_message = serialize_message(response_message)
                     st.session_state.messages.append(tool_calls_message)
                     
+                    tool_results = []
                     for tool_call in response_message.tool_calls:
                         function_name = tool_call.function.name
                         tool_call_id = tool_call.id
                         
                         if function_name in available_tools:
-                            with st.spinner(f"🛠️ Calling: {function_name}..."):
+                            with st.spinner(f"🛠️ Using: {function_name}..."):
                                 try:
                                     function_response = available_tools[function_name]()
+                                    
                                     tool_message = {
                                         "tool_call_id": tool_call_id,
                                         "role": "tool",
                                         "name": function_name,
                                         "content": function_response,
                                     }
+                                    tool_results.append(f"[{function_name}: {function_response}]")
                                 except Exception as e:
                                     tool_message = {
                                         "tool_call_id": tool_call_id,
@@ -268,8 +264,15 @@ if prompt := st.chat_input("Ask a coding question..."):
                                         "name": function_name,
                                         "content": f"Error: {str(e)}",
                                     }
+                                    tool_results.append(f"[{function_name}: Error - {str(e)}]")
                                 
                                 st.session_state.messages.append(tool_message)
+                    
+                    # Show tool results
+                    if tool_results:
+                        with st.expander("🔧 Tool Results", expanded=True):
+                            for result in tool_results:
+                                st.code(result, language="json")
                     
                     # Get final response with function results
                     with st.spinner("⚙️ Processing results..."):
@@ -311,7 +314,6 @@ if prompt := st.chat_input("Ask a coding question..."):
                 with st.expander("View Evaluation"):
                     st.info(evaluation)
             
-            # Add final assistant message to history
             st.session_state.messages.append(assistant_message_for_state)
 
 # --- Footer ---

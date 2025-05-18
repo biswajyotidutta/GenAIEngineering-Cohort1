@@ -1,0 +1,23 @@
+@everyone Here is the homework:
+Homework Assignment: Build a Streamlit App for Simplifying Complex Tech Topics
+
+Objective:
+Develop a Streamlit application that assists users in breaking down and explaining complex tech topics in simple terms. Your app should include:
+1. Guardrails: Ensure safe and appropriate use.
+2. System Prompts: Guide the assistant’s tone and behaviour.
+3. Tool Calling: Enable dynamic features (e.g., web search, summarisation).
+4. Evaluations: Assess the clarity and accuracy of explanations.
+
+What You'll Learn & Practice:
+1. Implementing AI-driven UX in a real-world app.
+2. Designing with user-centric prompt engineering.
+3. Integrating guardrails and evaluation mechanisms for reliability.
+4. Using Streamlit to build and deploy interactive AI tools.
+
+Why This Matters:
+This project helps you build foundational skills in AI product development and prompt design. You'll also gain hands-on experience with user safety and evaluation, which are key components in any modern AI application.
+
+Optional:
+Feel free to add any features, such as user feedback collection, topic history, or interactive quizzes. Be creative and consider real user needs!
+
+Let me know if you want some example components to get started.
